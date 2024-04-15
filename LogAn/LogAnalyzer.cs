@@ -2,8 +2,12 @@
 {
     public class LogAnalyzer
     {
+        public bool WasLastFileNameValid { get; set; }
+
         public bool IsValidLogFileName(string fileName)
         {
+            WasLastFileNameValid = false;
+
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 throw new ArgumentNullException("filename has to be provided");
@@ -14,6 +18,7 @@
                 return false;
             }
 
+            WasLastFileNameValid = true;
             return true;
         }
     }

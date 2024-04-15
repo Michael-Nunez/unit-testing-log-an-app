@@ -3,18 +3,11 @@
     [TestFixture]
     public class LogAnalyzersTests
     {
-        private LogAnalyzer m_analyzer = null;
-        
-        [SetUp]
-        public void SetUp()
-        {
-            m_analyzer = new LogAnalyzer();
-        }
-
         [Test]
         [Category("Fast Tests")]
         public void IsValidFileName_ValidFile_ReturnsTrue()
         {
+            var m_analyzer = MakeAnalyzer();
             bool result = m_analyzer.IsValidLogFileName("whatever.slf");
             Assert.IsTrue(result, "filename should be valid!!!");
         }
@@ -22,6 +15,7 @@
         [Test]
         public void IsValidFileName_validFileLowerCased_ReturnsTrue()
         {
+            var m_analyzer = MakeAnalyzer();
             bool result = m_analyzer.IsValidLogFileName("whatever.slf");
             Assert.IsTrue(result, "filename should be valid!!!");
         }
@@ -29,6 +23,7 @@
         [Test]
         public void IsValidFileName_validFileUpperCased_ReturnsTrue()
         {
+            var m_analyzer = MakeAnalyzer();
             bool result = m_analyzer.IsValidLogFileName("whatever.SLF");
             Assert.IsTrue(result, "filename should be valid!!!");
         }
@@ -41,10 +36,14 @@
             StringAssert.Contains("filename has to be provided", ex.Message);
         }
 
-        [TearDown]
-        public void TearDown()
+        [TestCase("badname.foo", false)]
+        [TestCase("badname.slf", true)]
+        public void IsValidFileName_WhenCalled_ChangesWasLastFileNameValid(string file,
+            bool expected)
         {
-            m_analyzer = null;
+            var la = MakeAnalyzer();
+            la.IsValidLogFileName(file);
+            Assert.AreEqual(expected, la.WasLastFileNameValid);
         }
 
         private LogAnalyzer MakeAnalyzer()
