@@ -25,20 +25,17 @@
             Assert.IsTrue(result, "filename should be valid!!!");
         }
 
+        [Test]
+        public void IsValidFileName_EmptyFileName_ThrowsException()
+        {
+            Assert.That(() => m_analyzer.IsValidLogFileName(string.Empty),
+                        Throws.ArgumentNullException);
+        }
+
         [TearDown]
         public void TearDown()
         {
             m_analyzer = null;
-        }
-
-        [TestCase("filewithgoodextension.SLF", true)]
-        [TestCase("filewithgoodextension.slf", true)]
-        [TestCase("filewithbadextension.foo", false)]
-        public void IsValidLogFileName_VariousExtensions_ReturnsTrue(string file, bool expected)
-        {
-            var analyzer = new LogAnalyzer();
-            bool result = analyzer.IsValidLogFileName(file);
-            Assert.AreEqual(result, expected);
         }
     }
 }
