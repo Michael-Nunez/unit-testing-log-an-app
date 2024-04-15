@@ -12,10 +12,11 @@
         }
 
         [Test]
-        [Ignore("there is a problem with this test")]
+        [Category("Fast Tests")]
         public void IsValidFileName_ValidFile_ReturnsTrue()
         {
-
+            bool result = m_analyzer.IsValidLogFileName("whatever.slf");
+            Assert.IsTrue(result, "filename should be valid!!!");
         }
 
         [Test]
