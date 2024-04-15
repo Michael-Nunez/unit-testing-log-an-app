@@ -12,6 +12,13 @@
         }
 
         [Test]
+        [Ignore("there is a problem with this test")]
+        public void IsValidFileName_ValidFile_ReturnsTrue()
+        {
+
+        }
+
+        [Test]
         public void IsValidFileName_validFileLowerCased_ReturnsTrue()
         {
             bool result = m_analyzer.IsValidLogFileName("whatever.slf");
@@ -28,14 +35,20 @@
         [Test]
         public void IsValidFileName_EmptyFileName_ThrowsException()
         {
-            Assert.That(() => m_analyzer.IsValidLogFileName(string.Empty),
-                        Throws.ArgumentNullException);
+            LogAnalyzer la = MakeAnalyzer();
+            var ex = Assert.Catch<Exception>(() => la.IsValidLogFileName(""));
+            StringAssert.Contains("filename has to be provided", ex.Message);
         }
 
         [TearDown]
         public void TearDown()
         {
             m_analyzer = null;
+        }
+
+        private LogAnalyzer MakeAnalyzer()
+        {
+            return new LogAnalyzer();
         }
     }
 }
