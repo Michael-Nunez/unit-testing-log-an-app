@@ -4,24 +4,14 @@
     public class LogAnalyzersTests
     {
         [Test]
-        public void IsValidFileName_NameSupportedExtension_ReturnsTrue()
+        public void Analyze_TooShortFileName_CallsWebService()
         {
-            var myFakeManager = new FakeExtensionManager();
-            myFakeManager.WillBeValid = true;
+            var mockService = new FakeWebService();
+            var log = new LogAnalyzer(mockService);
+            string tooShortFileName = "abc.ext";
+            log.Analyze(tooShortFileName);
 
-            var log = new LogAnalyzer(myFakeManager);
-
-            bool result = log.IsValidLogFileName("short.ext");
-            Assert.True(result);
-        }
-    }
-
-    internal class FakeExtensionManager : IExtensionManager
-    {
-        public bool WillBeValid = false;
-        public bool IsValid(string fileName)
-        {
-            return WillBeValid;
+            StringAssert.Contains("Filename too short: abc.ext", mockService.LastError);
         }
     }
 }

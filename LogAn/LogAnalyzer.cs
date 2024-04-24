@@ -2,16 +2,21 @@
 {
     public class LogAnalyzer
     {
-        private IExtensionManager manager;
+        private IWebService _service;
 
-        public LogAnalyzer(IExtensionManager mgr)
+        public LogAnalyzer(IWebService service)
         {
-            manager = mgr;
+            _service = service;
         }
 
-        public bool IsValidLogFileName(string fileName)
+        public void Analyze(string fileName)
         {
-            return manager.IsValid(fileName);
+            const int minimunCharactersLengthExpected = 8;
+
+            if (fileName.Length < minimunCharactersLengthExpected)
+            {
+                _service.LogError($"Filename too short: {fileName}");
+            }
         }
     }
 }
