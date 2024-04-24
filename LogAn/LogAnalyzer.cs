@@ -2,11 +2,13 @@
 {
     public class LogAnalyzer
     {
-        private IWebService _service;
+        private IWebService _webService {  get; set; }
+        private IEmailService _emailService { get; set; }
 
-        public LogAnalyzer(IWebService service)
+        public LogAnalyzer(IWebService service, IEmailService emailService)
         {
-            _service = service;
+            _webService = service;
+            _emailService = emailService;
         }
 
         public void Analyze(string fileName)
@@ -15,7 +17,14 @@
 
             if (fileName.Length < minimunCharactersLengthExpected)
             {
-                _service.LogError($"Filename too short: {fileName}");
+                try
+                {
+                    _webService.LogError($"Filename too short: {fileName}");
+                }
+                catch (Exception e)
+                {
+                    _emailService.SendEmail("someone@somewhere.com", "can't log", e.Message);
+                }
             }
         }
     }
