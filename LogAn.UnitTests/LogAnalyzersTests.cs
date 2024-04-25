@@ -1,24 +1,54 @@
-﻿namespace LogAn.UnitTests
+﻿using NSubstitute;
+using NUnit.Framework.Internal;
+
+namespace LogAn.UnitTests
 {
     [TestFixture]
     public class LogAnalyzersTests
     {
         [Test]
-        public void Analyze_WebService_Throws_SendEmail()
+        public void Analyze_LoggerThrows_CallsWebService()
         {
-            var stubService = new FakeWebService();
-            stubService.ToThrow = new Exception("fake exception");
+            var mockWebService = Substitute.For<FakeWebService>();
 
-            var mockEmail = new FakeEmailService();
+            var stubLogger = Substitute.For<FakeLogger2>();
+            stubLogger
+                .When(logger => logger.LogError(Arg.Any<string>()))
+                .Do(info => { throw new Exception("fake exception"); });
 
-            var log = new LogAnalyzer(stubService, mockEmail);
+            var analyzer2 = new LogAnalyzer2(stubLogger, mockWebService);
+            analyzer2.MinimumNameLength = 8;
 
             string tooShortFileName = "abc.ext";
-            log.Analyze(tooShortFileName);
+            analyzer2.Analyze(tooShortFileName);
 
-            StringAssert.Contains("someone@somewhere.com", mockEmail.To);
-            StringAssert.Contains("can't log", mockEmail.Subject);
-            StringAssert.Contains("fake exception", mockEmail.Body);
+            mockWebService.Received().Write(Arg.Is<string>(s => s.Contains("fake exception")));
+        }
+    }
+
+    public class FakeWebService : IWebService
+    {
+        public string MessageToWebService;
+
+        public void Write(string message)
+        {
+            MessageToWebService = message;
+        }
+    }
+
+    public class FakeLogger2 : ILogger
+    {
+        public Exception WillThrow = null;
+        public string LoggerGotMessage = null;
+
+        public void LogError(string message)
+        {
+            LoggerGotMessage = message;
+
+            if (WillThrow != null)
+            {
+                throw WillThrow;
+            }
         }
     }
 }
