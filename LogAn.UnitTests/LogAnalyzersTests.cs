@@ -7,48 +7,26 @@ namespace LogAn.UnitTests
     public class LogAnalyzersTests
     {
         [Test]
-        public void Analyze_LoggerThrows_CallsWebService()
+        public void IsValid_LengthBiggerThan8_IsFalse()
         {
-            var mockWebService = Substitute.For<FakeWebService>();
-
-            var stubLogger = Substitute.For<FakeLogger2>();
-            stubLogger
-                .When(logger => logger.LogError(Arg.Any<string>()))
-                .Do(info => { throw new Exception("fake exception"); });
-
-            var analyzer2 = new LogAnalyzer2(stubLogger, mockWebService);
-            analyzer2.MinimumNameLength = 8;
-
-            string tooShortFileName = "abc.ext";
-            analyzer2.Analyze(tooShortFileName);
-
-            mockWebService.Received().Write(Arg.Is<string>(s => s.Contains("fake exception")));
+            var logan = GetNewAnalyzer();
+            bool valid = logan.IsValid("123456789");
+            Assert.IsFalse(valid);
         }
-    }
 
-    public class FakeWebService : IWebService
-    {
-        public string MessageToWebService;
-
-        public void Write(string message)
+        [Test]
+        public void IsValid_LengthSmallerThan8_IsTrue()
         {
-            MessageToWebService = message;
+            var logan = GetNewAnalyzer();
+            bool valid = logan.IsValid("1234567");
+            Assert.IsTrue(valid);
         }
-    }
 
-    public class FakeLogger2 : ILogger
-    {
-        public Exception WillThrow = null;
-        public string LoggerGotMessage = null;
-
-        public void LogError(string message)
+        private LogAnalyzer GetNewAnalyzer()
         {
-            LoggerGotMessage = message;
-
-            if (WillThrow != null)
-            {
-                throw WillThrow;
-            }
+            var analyzer = new LogAnalyzer();
+            analyzer.Initialize();
+            return analyzer;
         }
     }
 }
